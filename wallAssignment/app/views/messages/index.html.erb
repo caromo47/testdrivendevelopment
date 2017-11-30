@@ -1,0 +1,38 @@
+<div class="navbar">
+	<h2>Coding Dojo Wall</h2>
+	<h2>Welcome <%= @user.username %></h2>
+	<%= link_to "Logout", '/users/logout', data: {method: :delete, confirm: "Are you sure?"} %>
+</div>
+
+<% if flash[:errors] %>
+	<% flash[:errors].each do |e| %>
+		<%= e %>
+	<% end %>
+<% end %>
+
+<h1>Post A Message</h1>
+<form action="/messages/create" method="post">
+	<input type="hidden" name="authenticity_token" value="<%=form_authenticity_token%>">
+	<textarea name="message[message]" rows="8" cols="80"></textarea>
+	<input type="submit" value="Post A Message">
+</form>
+<fieldset>
+	<% @messages.each do |e| %>
+		<h2><%= "#{e.username} - #{e.created_at.strftime("%B #{e.created_at.day.ordinalize}, %Y")}" %></h2>
+		<p><%= e.message %></p>
+
+		<h3>Comments</h3>
+
+		<% e.comments.each do |comment| %>
+			<h5><%= "#{comment.user.username} - #{comment.created_at.strftime("%B #{comment.created_at.day.ordinalize}, %Y")}" %></h5>
+			<p><%= comment.content %></p>
+		<% end %>
+
+		<form action="/comments/create" method="post">
+			<input type="hidden" name="comment[message_id]" value="<%= e.id %>">
+			<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+			<textarea name="comment[content]" rows="8" cols="80"></textarea>
+			<input type="submit" value="Post A Comment">
+		</form>
+	<% end %>
+</fieldset>
